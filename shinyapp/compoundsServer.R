@@ -647,24 +647,23 @@ observeEvent(input$uploadSubstances, {
 #loads the data table in the 'Compounds' page using the gettabledata result
 output$customTable <- renderDT({
   req(length(getTableData$result()) > 0)
-  result <- getTableData$result()
-  data <- result[, c("Name", 
-                                "Molecular Formula", 
-                                "Molecular Weight", 
-                                "pKow", 
-                                "Reference Materials", "Minimum Mass Fraction (µg/g)", 
-                                "Maximum Mass Fraction (µg/g)", "Minimum Mass Concentration (µg/mL)", 
-                                "Maximum Mass Concentration (µg/mL)")]
+  result <- janitor::clean_names(getTableData$result())
   
-  data <- data.frame("Name" = data$Name, 
-                     "Molecular Formula" = data$"Molecular Formula", 
-                     "Molecular Weight" = as.numeric(data$"Molecular Weight"), 
-                     "pKow" = as.numeric(data$"pKow"),
-                     "Reference Materials" = data$"Reference Materials", 
-                     "Minimum Mass Fraction (µg/g)" = as.numeric(data$"Minimum Mass Fraction (µg/g)"), 
-                     "Maximum Mass Fraction (µg/g)" = as.numeric(data$"Maximum Mass Fraction (µg/g)"), 
-                     "Minimum Mass Concentration (µg/mL)" = as.numeric(data$"Minimum Mass Concentration (µg/mL)"), 
-                     "Maximum Mass Concentration (µg/mL)" = as.numeric(data$"Maximum Mass Concentration (µg/mL)"))
+  data <- result[, c("name", "molecular_formula", "molecular_weight", 
+                     "pkow", "reference_materials", 
+                     "minimum_mass_fraction_ug_g", 
+                     "maximum_mass_fraction_ug_g", 
+                     "minimum_mass_concentration_ug_ml", 
+                     "maximum_mass_concentration_ug_ml")]
+  
+  # Convert to proper types
+  data$molecular_weight <- as.numeric(data$molecular_weight)
+  data$pkow <- as.numeric(data$pkow)
+  data$minimum_mass_fraction_ug_g <- as.numeric(data$minimum_mass_fraction_ug_g)
+  data$maximum_mass_fraction_ug_g <- as.numeric(data$maximum_mass_fraction_ug_g)
+  data$minimum_mass_concentration_ug_ml <- as.numeric(data$minimum_mass_concentration_ug_ml)
+  data$maximum_mass_concentration_ug_ml <- as.numeric(data$maximum_mass_concentration_ug_ml)
+
   
   colnames(data) <- c("Name", "Molecular Formula", "Molecular Weight", "pKow", "Reference Materials", "Minimum Mass Fraction (µg/g)", 
                       "Maximum Mass Fraction (µg/g)", "Minimum Mass Concentration (µg/mL)", 

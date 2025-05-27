@@ -22,6 +22,7 @@ library(webchem)
 library(curl)
 library(future)                     #in order to run long processes
 library(promises)                   #in order to run long processes
+library(janitor)
 plan(multisession, workers = 3)
 source("tooltip_ui.R")
 
