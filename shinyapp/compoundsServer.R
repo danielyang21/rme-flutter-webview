@@ -214,11 +214,11 @@ getTableData <- ExtendedTask$new(function(analytes){
               units <- units[!is.na(massFrac)]
               massFrac <- massFrac[!is.na(massFrac)]
               
-              #convert units to µg/g (note: mg/kg is equivalent to µg/g so it is not converted)
+              #convert units to &micro;g/g (note: mg/kg is equivalent to &micro;g/g so it is not converted)
               if (length(units) > 0 && length(massFrac) > 0) {
                 for (l in 1:length(units)){
                   if (units[[l]] == "mg/g") { massFrac[[l]] <- 1000 * massFrac[[l]]} 
-                  else if (units[[l]] == "µg/kg") {massFrac[[l]] <- massFrac[[l]] / 1000} 
+                  else if (units[[l]] == "&micro;g/kg") {massFrac[[l]] <- massFrac[[l]] / 1000} 
                   else if (units[[l]] == "g/g") {massFrac[[l]] <- 1000000 * massFrac[[l]]}
                   else if (units[[l]] == "pg/g") {massFrac[[l]] <- massFrac[[l]] / 1000000}
                   else if (units[[l]] == "ng/g") {massFrac[[l]] <- massFrac[[l]] / 1000}
@@ -241,10 +241,10 @@ getTableData <- ExtendedTask$new(function(analytes){
               units <- units[!is.na(massConc)]
               massConc <- massConc[!is.na(massConc)]
               
-              #converting units to µg/mL (which is equivalent to mg/kg and mg/L )
+              #converting units to &micro;g/mL (which is equivalent to mg/kg and mg/L )
               if (length(units) > 0 && length(massConc) > 0) {
                 for (l in 1:length(units)){
-                  if (units[[l]] == "µg/L") { massConc[[l]] = massConc[[l]] / 1000} 
+                  if (units[[l]] == "&micro;g/L") { massConc[[l]] = massConc[[l]] / 1000} 
                   else if (units[[l]] == "mg/mL") {massConc[[l]] = massConc[[l]] * 1000}
                   else if (units[[l]] == "g/mL") {massConc[[l]] = massConc[[l]] * 1000000}
                 }
@@ -294,9 +294,9 @@ getTableData <- ExtendedTask$new(function(analytes){
       
       colnames(data) <- c("Name", "CID", "Molecular Formula", 
                           "Molecular Weight", "Isomeric Smiles", 
-                          "InchiKey", "pKow", "Exact Mass", "TPSA", "CRMs", "Minimum Mass Fraction (µg/g)", 
-                          "Maximum Mass Fraction (µg/g)", "Minimum Mass Concentration (µg/mL)", 
-                          "Maximum Mass Concentration (µg/mL)")
+                          "InchiKey", "pKow", "Exact Mass", "TPSA", "CRMs", "Minimum Mass Fraction (&micro;g/g)", 
+                          "Maximum Mass Fraction (&micro;g/g)", "Minimum Mass Concentration (&micro;g/mL)", 
+                          "Maximum Mass Concentration (&micro;g/mL)")
       
       #find all the common crms
       allcrms <- data[, "CRMs"]
@@ -339,9 +339,9 @@ getTableData <- ExtendedTask$new(function(analytes){
       colnames(data) <- c("Name", "CID", "Molecular Formula", 
                           "Molecular Weight", "Isomeric Smiles", 
                           "InchiKey", "pKow", "Exact Mass", "TPSA", 
-                          "CRMs", "Minimum Mass Fraction (µg/g)", 
-                          "Maximum Mass Fraction (µg/g)", "Minimum Mass Concentration (µg/mL)", 
-                          "Maximum Mass Concentration (µg/mL)", "Reference Materials")
+                          "CRMs", "Minimum Mass Fraction (&micro;g/g)", 
+                          "Maximum Mass Fraction (&micro;g/g)", "Minimum Mass Concentration (&micro;g/mL)", 
+                          "Maximum Mass Concentration (&micro;g/mL)", "Reference Materials")
       
     }
     
@@ -652,23 +652,23 @@ output$customTable <- renderDT({
                                 "Molecular Formula", 
                                 "Molecular Weight", 
                                 "pKow", 
-                                "Reference Materials", "Minimum Mass Fraction (µg/g)", 
-                                "Maximum Mass Fraction (µg/g)", "Minimum Mass Concentration (µg/mL)", 
-                                "Maximum Mass Concentration (µg/mL)")]
+                                "Reference Materials", "Minimum Mass Fraction (&micro;g/g)", 
+                                "Maximum Mass Fraction (&micro;g/g)", "Minimum Mass Concentration (&micro;g/mL)", 
+                                "Maximum Mass Concentration (&micro;g/mL)")]
   
   data <- data.frame("Name" = data$Name, 
                      "Molecular Formula" = data$"Molecular Formula", 
                      "Molecular Weight" = as.numeric(data$"Molecular Weight"), 
                      "pKow" = as.numeric(data$"pKow"),
                      "Reference Materials" = data$"Reference Materials", 
-                     "Minimum Mass Fraction (µg/g)" = as.numeric(data$"Minimum Mass Fraction (µg/g)"), 
-                     "Maximum Mass Fraction (µg/g)" = as.numeric(data$"Maximum Mass Fraction (µg/g)"), 
-                     "Minimum Mass Concentration (µg/mL)" = as.numeric(data$"Minimum Mass Concentration (µg/mL)"), 
-                     "Maximum Mass Concentration (µg/mL)" = as.numeric(data$"Maximum Mass Concentration (µg/mL)"))
+                     "Minimum Mass Fraction (&micro;g/g)" = as.numeric(data$"Minimum Mass Fraction (&micro;g/g)"), 
+                     "Maximum Mass Fraction (&micro;g/g)" = as.numeric(data$"Maximum Mass Fraction (&micro;g/g)"), 
+                     "Minimum Mass Concentration (&micro;g/mL)" = as.numeric(data$"Minimum Mass Concentration (&micro;g/mL)"), 
+                     "Maximum Mass Concentration (&micro;g/mL)" = as.numeric(data$"Maximum Mass Concentration (&micro;g/mL)"))
   
-  colnames(data) <- c("Name", "Molecular Formula", "Molecular Weight", "pKow", "Reference Materials", "Minimum Mass Fraction (µg/g)", 
-                      "Maximum Mass Fraction (µg/g)", "Minimum Mass Concentration (µg/mL)", 
-                      "Maximum Mass Concentration (µg/mL)")
+  colnames(data) <- c("Name", "Molecular Formula", "Molecular Weight", "pKow", "Reference Materials", "Minimum Mass Fraction (&micro;g/g)", 
+                      "Maximum Mass Fraction (&micro;g/g)", "Minimum Mass Concentration (&micro;g/mL)", 
+                      "Maximum Mass Concentration (&micro;g/mL)")
   
   datatable(data, 
             options = list(pageLength = 10, responsive = FALSE, scrollX = TRUE), 
