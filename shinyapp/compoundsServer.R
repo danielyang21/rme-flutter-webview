@@ -292,11 +292,24 @@ getTableData <- ExtendedTask$new(function(analytes){
         data <- rbind(data, dataRow)
       }
       
-      colnames(data) <- c("Name", "CID", "Molecular Formula", 
-                          "Molecular Weight", "Isomeric Smiles", 
-                          "InchiKey", "pKow", "Exact Mass", "TPSA", "CRMs", "Minimum Mass Fraction (µg/g)", 
-                          "Maximum Mass Fraction (µg/g)", "Minimum Mass Concentration (µg/mL)", 
-                          "Maximum Mass Concentration (µg/mL)")
+      # First create the data frame with clean column names
+        display_data <- as.data.frame(data)
+        names(display_data) <- c("name", "cid", "molecular_formula", 
+                                "molecular_weight", "isomeric_smiles", 
+                                "inchikey", "pkow", "exact_mass", "tpsa", "crms", 
+                                "min_mass_fraction_ug_g", 
+                                "max_mass_fraction_ug_g", 
+                                "min_mass_concentration_ug_ml", 
+                                "max_mass_concentration_ug_ml")
+
+        # Then add display names as an attribute if needed
+        attr(display_data, "display_names") <- c("Name", "CID", "Molecular Formula",
+                                            "Molecular Weight", "Isomeric Smiles",
+                                            "InchiKey", "pKow", "Exact Mass", "TPSA", "CRMs",
+                                            "Minimum Mass Fraction (µg/g)",
+                                            "Maximum Mass Fraction (µg/g)",
+                                            "Minimum Mass Concentration (µg/mL)",
+                                            "Maximum Mass Concentration (µg/mL)")
       
       #find all the common crms
       allcrms <- data[, "CRMs"]
@@ -447,9 +460,9 @@ observeEvent(input$customTable_rows_selected, {
     df = xml_to_dataframe(d)[-1,-c(1,2)]
     
     #if searching the name column in DR resulted in nothing, then search the inchikey
-    if (df$title[1] == "No results" && length(row$InchiKey) > 0) {
+    if (df$title[1] == "No results" && length(row$inchikey) > 0) {
       link <- paste('https://nrc-digital-repository.canada.ca/eng/search/atom/?q=',
-                    row$InchiKey, '&q=&q=&y1=&y2=&cn=crm&ps=10&s=sc&av=1', sep="")
+                    row$inchikey, '&q=&q=&y1=&y2=&cn=crm&ps=10&s=sc&av=1', sep="")
       
       h <- curl::new_handle()
       curl::handle_setopt(h, ssl_verifypeer = 0)
@@ -490,7 +503,7 @@ observeEvent(input$customTable_rows_selected, {
             #check if the inchikey matches (or name), and if it does, add it to the spectral dropdown
             inchikey <- data[grep("inchikey", data[,1], ignore.case = TRUE), 2]
             substanceName <- trimws(data[grep("substance", data[,1], ignore.case = TRUE), 2])
-            if (trimws(inchikey) == ifelse(is.null(trimws(row$InchiKey)), trimws(row$InchiKey), "") | grepl(substanceName, row$Name, ignore.case = TRUE)) {
+            if (trimws(inchikey) == ifelse(is.null(trimws(row$inchikey)), trimws(row$inchikey), "") | grepl(substanceName, row$name, ignore.case = TRUE)) {
               dataType <- ifelse(length(data[grep("Type of Data", data[,1], ignore.case = TRUE), 2]) > 0, 
                                  data[grep("Type of Data", data[,1], ignore.case = TRUE), 2], "mass spectrum")
               substance <- data[grep("Substance", data[,1], ignore.case = TRUE), 2]
@@ -509,7 +522,7 @@ observeEvent(input$customTable_rows_selected, {
             #check if the inchikey matches (or name), and if it does, add it to the spectral dropdown
             inchikey <- data[grep("inchikey", data[,1], ignore.case = TRUE), 2]
             substanceName <- trimws(data[grep("substance", data[,1], ignore.case = TRUE), 2])
-            if (trimws(inchikey) == ifelse(is.null(trimws(row$InchiKey)), trimws(row$InchiKey), "") | grepl(substanceName, row$Name, ignore.case = TRUE)) {
+            if (trimws(inchikey) == ifelse(is.null(trimws(row$inchikey)), trimws(row$inchikey), "") | grepl(substanceName, row$name, ignore.case = TRUE)) {
               dataType <- ifelse(length(data[grep("Type of Data", data[,1], ignore.case = TRUE), 2]) > 0, 
                                  data[grep("Type of Data", data[,1], ignore.case = TRUE), 2], "NMR")
               substance <- data[grep("Substance", data[,1], ignore.case = TRUE), 2]
@@ -529,7 +542,7 @@ observeEvent(input$customTable_rows_selected, {
             #check if the inchikey matches (or name), and if it does, add it to the spectral dropdown
             inchikey <- data[grep("inchikey", data[,1], ignore.case = TRUE), 2]
             substanceName <- trimws(data[grep("substance", data[,1], ignore.case = TRUE), 2])
-            if (trimws(inchikey) == ifelse(is.null(trimws(row$InchiKey)), trimws(row$InchiKey), "") | grepl(substanceName, row$Name, ignore.case = TRUE)) {
+            if (trimws(inchikey) == ifelse(is.null(trimws(row$inchikey)), trimws(row$inchikey), "") | grepl(substanceName, row$name, ignore.case = TRUE)) {
               dataType <- ifelse(length(data[grep("Type of Data", data[,1], ignore.case = TRUE), 2]) > 0, 
                                  data[grep("Type of Data", data[,1], ignore.case = TRUE), 2], "MS/MS")
               substance <- data[grep("Substance", data[,1], ignore.case = TRUE), 2]
