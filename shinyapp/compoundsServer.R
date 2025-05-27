@@ -6,6 +6,7 @@ xml_to_dataframe <- function(nodeset){
     names(tmp) <- xml2::xml_name(xml2::xml_children(x))
     return(as.list(tmp))
   })
+  print(lst)
   result <- do.call(plyr::rbind.fill, lapply(lst, function(x)
     as.data.frame(x, stringsAsFactors = F)))
   return(tibble::as_tibble(result))
