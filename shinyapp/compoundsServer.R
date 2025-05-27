@@ -644,11 +644,11 @@ observeEvent(input$uploadSubstances, {
   }
 })
 
-#loads the data table in the 'Compounds' page using the gettabledata result
 output$customTable <- renderDT({
   req(length(getTableData$result()) > 0)
   result <- janitor::clean_names(getTableData$result())
   
+  #use cleaned column names (with underscores instead of spaces/special chars)
   data <- result[, c("name", "molecular_formula", "molecular_weight", 
                      "pkow", "reference_materials", 
                      "minimum_mass_fraction_ug_g", 
@@ -656,7 +656,7 @@ output$customTable <- renderDT({
                      "minimum_mass_concentration_ug_ml", 
                      "maximum_mass_concentration_ug_ml")]
   
-  # Convert to proper types
+  #convert to proper types
   data$molecular_weight <- as.numeric(data$molecular_weight)
   data$pkow <- as.numeric(data$pkow)
   data$minimum_mass_fraction_ug_g <- as.numeric(data$minimum_mass_fraction_ug_g)
@@ -664,15 +664,17 @@ output$customTable <- renderDT({
   data$minimum_mass_concentration_ug_ml <- as.numeric(data$minimum_mass_concentration_ug_ml)
   data$maximum_mass_concentration_ug_ml <- as.numeric(data$maximum_mass_concentration_ug_ml)
 
-  
-  colnames(data) <- c("Name", "Molecular Formula", "Molecular Weight", "pKow", "Reference Materials", "Minimum Mass Fraction (µg/g)", 
-                      "Maximum Mass Fraction (µg/g)", "Minimum Mass Concentration (µg/mL)", 
-                      "Maximum Mass Concentration (µg/mL)")
+  #set display names for the table
+  colnames(data) <- c("Name", "Molecular Formula", "Molecular Weight", "pKow", "Reference Materials", 
+                      "Min Mass Fraction (µg/g)", "Max Mass Fraction (µg/g)", 
+                      "Min Mass Concentration (µg/mL)", "Max Mass Concentration (µg/mL)")
   
   datatable(data, 
             options = list(pageLength = 10, responsive = FALSE, scrollX = TRUE), 
-            filter= list(position='top', clear = FALSE), escape = FALSE)
+            filter = list(position = 'top', clear = FALSE), 
+            escape = FALSE)
 })
+
 
 #unselect all rows in the custom table when unselect button is clicked
 observeEvent(input$unselect, {
