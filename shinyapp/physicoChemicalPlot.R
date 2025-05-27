@@ -170,9 +170,8 @@ output$plot <- renderPlotly({
     ylim(500, maxMW)
   }
   
-  p <- ggplot(data, aes(x = pKow, y = `Molecular Weight`)) +
-    theme_classic() +
-    geom_point(aes(text = tooltip), size = 2, alpha = 0.7) +
+  p <- ggplot(data, aes(x = pKow, y = `Molecular Weight`, text = tooltip)) +
+    geom_point(size = 2, alpha = 0.7) +
     ylab("MW") +
     xlim + 
     ylim +
