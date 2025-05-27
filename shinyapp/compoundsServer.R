@@ -648,6 +648,7 @@ observeEvent(input$uploadSubstances, {
 output$customTable <- renderDT({
   req(length(getTableData$result()) > 0)
   result <- getTableData$result()
+  colnames(result) <- iconv(colnames(result), from = "", to = "UTF-8")
   data <- result[, c("Name", 
                                 "Molecular Formula", 
                                 "Molecular Weight", 
