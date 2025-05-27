@@ -292,24 +292,11 @@ getTableData <- ExtendedTask$new(function(analytes){
         data <- rbind(data, dataRow)
       }
       
-      # First create the data frame with clean column names
-        display_data <- as.data.frame(data)
-        names(display_data) <- c("name", "cid", "molecular_formula", 
-                                "molecular_weight", "isomeric_smiles", 
-                                "inchikey", "pkow", "exact_mass", "tpsa", "crms", 
-                                "min_mass_fraction_ug_g", 
-                                "max_mass_fraction_ug_g", 
-                                "min_mass_concentration_ug_ml", 
-                                "max_mass_concentration_ug_ml")
-
-        # Then add display names as an attribute if needed
-        attr(display_data, "display_names") <- c("Name", "CID", "Molecular Formula",
-                                            "Molecular Weight", "Isomeric Smiles",
-                                            "InchiKey", "pKow", "Exact Mass", "TPSA", "CRMs",
-                                            "Minimum Mass Fraction (µg/g)",
-                                            "Maximum Mass Fraction (µg/g)",
-                                            "Minimum Mass Concentration (µg/mL)",
-                                            "Maximum Mass Concentration (µg/mL)")
+      colnames(data) <- c("Name", "CID", "Molecular Formula", 
+                          "Molecular Weight", "Isomeric Smiles", 
+                          "InchiKey", "pKow", "Exact Mass", "TPSA", "CRMs", "Minimum Mass Fraction (µg/g)", 
+                          "Maximum Mass Fraction (µg/g)", "Minimum Mass Concentration (µg/mL)", 
+                          "Maximum Mass Concentration (µg/mL)")
       
       #find all the common crms
       allcrms <- data[, "CRMs"]
@@ -460,9 +447,9 @@ observeEvent(input$customTable_rows_selected, {
     df = xml_to_dataframe(d)[-1,-c(1,2)]
     
     #if searching the name column in DR resulted in nothing, then search the inchikey
-    if (df$title[1] == "No results" && length(row$inchikey) > 0) {
+    if (df$title[1] == "No results" && length(row$InchiKey) > 0) {
       link <- paste('https://nrc-digital-repository.canada.ca/eng/search/atom/?q=',
-                    row$inchikey, '&q=&q=&y1=&y2=&cn=crm&ps=10&s=sc&av=1', sep="")
+                    row$InchiKey, '&q=&q=&y1=&y2=&cn=crm&ps=10&s=sc&av=1', sep="")
       
       h <- curl::new_handle()
       curl::handle_setopt(h, ssl_verifypeer = 0)
@@ -503,7 +490,7 @@ observeEvent(input$customTable_rows_selected, {
             #check if the inchikey matches (or name), and if it does, add it to the spectral dropdown
             inchikey <- data[grep("inchikey", data[,1], ignore.case = TRUE), 2]
             substanceName <- trimws(data[grep("substance", data[,1], ignore.case = TRUE), 2])
-            if (trimws(inchikey) == ifelse(is.null(trimws(row$inchikey)), trimws(row$inchikey), "") | grepl(substanceName, row$name, ignore.case = TRUE)) {
+            if (trimws(inchikey) == ifelse(is.null(trimws(row$InchiKey)), trimws(row$InchiKey), "") | grepl(substanceName, row$Name, ignore.case = TRUE)) {
               dataType <- ifelse(length(data[grep("Type of Data", data[,1], ignore.case = TRUE), 2]) > 0, 
                                  data[grep("Type of Data", data[,1], ignore.case = TRUE), 2], "mass spectrum")
               substance <- data[grep("Substance", data[,1], ignore.case = TRUE), 2]
@@ -522,7 +509,7 @@ observeEvent(input$customTable_rows_selected, {
             #check if the inchikey matches (or name), and if it does, add it to the spectral dropdown
             inchikey <- data[grep("inchikey", data[,1], ignore.case = TRUE), 2]
             substanceName <- trimws(data[grep("substance", data[,1], ignore.case = TRUE), 2])
-            if (trimws(inchikey) == ifelse(is.null(trimws(row$inchikey)), trimws(row$inchikey), "") | grepl(substanceName, row$name, ignore.case = TRUE)) {
+            if (trimws(inchikey) == ifelse(is.null(trimws(row$InchiKey)), trimws(row$InchiKey), "") | grepl(substanceName, row$Name, ignore.case = TRUE)) {
               dataType <- ifelse(length(data[grep("Type of Data", data[,1], ignore.case = TRUE), 2]) > 0, 
                                  data[grep("Type of Data", data[,1], ignore.case = TRUE), 2], "NMR")
               substance <- data[grep("Substance", data[,1], ignore.case = TRUE), 2]
@@ -542,7 +529,7 @@ observeEvent(input$customTable_rows_selected, {
             #check if the inchikey matches (or name), and if it does, add it to the spectral dropdown
             inchikey <- data[grep("inchikey", data[,1], ignore.case = TRUE), 2]
             substanceName <- trimws(data[grep("substance", data[,1], ignore.case = TRUE), 2])
-            if (trimws(inchikey) == ifelse(is.null(trimws(row$inchikey)), trimws(row$inchikey), "") | grepl(substanceName, row$name, ignore.case = TRUE)) {
+            if (trimws(inchikey) == ifelse(is.null(trimws(row$InchiKey)), trimws(row$InchiKey), "") | grepl(substanceName, row$Name, ignore.case = TRUE)) {
               dataType <- ifelse(length(data[grep("Type of Data", data[,1], ignore.case = TRUE), 2]) > 0, 
                                  data[grep("Type of Data", data[,1], ignore.case = TRUE), 2], "MS/MS")
               substance <- data[grep("Substance", data[,1], ignore.case = TRUE), 2]
@@ -657,37 +644,36 @@ observeEvent(input$uploadSubstances, {
   }
 })
 
+#loads the data table in the 'Compounds' page using the gettabledata result
 output$customTable <- renderDT({
   req(length(getTableData$result()) > 0)
-  result <- janitor::clean_names(getTableData$result())
+  result <- getTableData$result()
+  data <- result[, c("Name", 
+                                "Molecular Formula", 
+                                "Molecular Weight", 
+                                "pKow", 
+                                "Reference Materials", "Minimum Mass Fraction (µg/g)", 
+                                "Maximum Mass Fraction (µg/g)", "Minimum Mass Concentration (µg/mL)", 
+                                "Maximum Mass Concentration (µg/mL)")]
   
-  #use cleaned column names (with underscores instead of spaces/special chars)
-  data <- result[, c("name", "molecular_formula", "molecular_weight", 
-                     "pkow", "reference_materials", 
-                     "minimum_mass_fraction_ug_g", 
-                     "maximum_mass_fraction_ug_g", 
-                     "minimum_mass_concentration_ug_ml", 
-                     "maximum_mass_concentration_ug_ml")]
+  data <- data.frame("Name" = data$Name, 
+                     "Molecular Formula" = data$"Molecular Formula", 
+                     "Molecular Weight" = as.numeric(data$"Molecular Weight"), 
+                     "pKow" = as.numeric(data$"pKow"),
+                     "Reference Materials" = data$"Reference Materials", 
+                     "Minimum Mass Fraction (µg/g)" = as.numeric(data$"Minimum Mass Fraction (µg/g)"), 
+                     "Maximum Mass Fraction (µg/g)" = as.numeric(data$"Maximum Mass Fraction (µg/g)"), 
+                     "Minimum Mass Concentration (µg/mL)" = as.numeric(data$"Minimum Mass Concentration (µg/mL)"), 
+                     "Maximum Mass Concentration (µg/mL)" = as.numeric(data$"Maximum Mass Concentration (µg/mL)"))
   
-  #convert to proper types
-  data$molecular_weight <- as.numeric(data$molecular_weight)
-  data$pkow <- as.numeric(data$pkow)
-  data$minimum_mass_fraction_ug_g <- as.numeric(data$minimum_mass_fraction_ug_g)
-  data$maximum_mass_fraction_ug_g <- as.numeric(data$maximum_mass_fraction_ug_g)
-  data$minimum_mass_concentration_ug_ml <- as.numeric(data$minimum_mass_concentration_ug_ml)
-  data$maximum_mass_concentration_ug_ml <- as.numeric(data$maximum_mass_concentration_ug_ml)
-
-  #set display names for the table
-  colnames(data) <- c("Name", "Molecular Formula", "Molecular Weight", "pKow", "Reference Materials", 
-                      "Min Mass Fraction (µg/g)", "Max Mass Fraction (µg/g)", 
-                      "Min Mass Concentration (µg/mL)", "Max Mass Concentration (µg/mL)")
+  colnames(data) <- c("Name", "Molecular Formula", "Molecular Weight", "pKow", "Reference Materials", "Minimum Mass Fraction (µg/g)", 
+                      "Maximum Mass Fraction (µg/g)", "Minimum Mass Concentration (µg/mL)", 
+                      "Maximum Mass Concentration (µg/mL)")
   
   datatable(data, 
             options = list(pageLength = 10, responsive = FALSE, scrollX = TRUE), 
-            filter = list(position = 'top', clear = FALSE), 
-            escape = FALSE)
+            filter= list(position='top', clear = FALSE), escape = FALSE)
 })
-
 
 #unselect all rows in the custom table when unselect button is clicked
 observeEvent(input$unselect, {
